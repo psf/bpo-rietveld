@@ -202,9 +202,9 @@ var publish_link = "{%url codereview.views.publish issue.key.id%}";
    href="http://code.google.com/p/rietveld">Source code</a>
 |
 {%if user%}
-<a class="novisit" href="{{sign_out}}">Sign out</a>
+<a class="novisit" href="/?@action=logout">Sign out</a>
 {% else %}
-<a class="novisit" href="{{sign_in}}">Sign in</a>
+<a class="novisit" href="/">Sign in</a>
 {%endif%}
 </div>
 
@@ -226,11 +226,13 @@ var publish_link = "{%url codereview.views.publish issue.key.id%}";
 {%block popup%}{%endblock%}
 
 <p></p>
-<div style="float: left;">
-  <a target="_blank" href="http://code.google.com/appengine/"><img border="0"
-   src="{{media_url}}appengine-noborder-120x30.gif"
-   alt="Powered by Google App Engine" /></a>
-</div>
+<div id="footer" style="float:left; font-size:75%">
+<a href="http://www.python.org/about/website">Website maintained by the Python community</a><br />
+
+<a href="http://www.upfrontsystems.co.za/" title="issue tracker hosting provided by Upfront Systems, South Africa">hosting by Upfront Systems</a> <br/>
+Copyright &copy; 1990-2012, <a href="http://python.org/psf">Python Software Foundation</a><br />
+<a href="http://python.org/about/legal">Legal Statements</a>
+</div> 
 
 <div class="extra" style="font-size: 9pt; float: right; text-align: right;">
   <div style="height:14px;">
@@ -252,18 +254,6 @@ var publish_link = "{%url codereview.views.publish issue.key.id%}";
   </div>
   <div style="margin-top: .3em;">This is Rietveld <a href='http://code.google.com/p/rietveld/updates/list'>{{rietveld_revision}}</a></div>
 </div>
-
-{%if not is_dev%}
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-var pageTracker = _gat._getTracker("UA-4803694-4");
-pageTracker._initData();
-pageTracker._trackPageview();
-</script>
-{%endif%}
 
 </body>
 </html>
