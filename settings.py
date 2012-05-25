@@ -107,9 +107,12 @@ LOGIN_REDIRECT_URL = '/'
 RIETVELD_INCOMING_MAIL_MAX_SIZE = 500 * 1024  # 500K
 RIETVELD_REVISION = '<unknown>'
 try:
-    RIETVELD_REVISION = subprocess.check_output(['hg','identify','-i',
-                                                 os.path.dirname(__file__)
-                                                 ]).strip()
+    p = subprocess.Popen(['hg','identify','-i', os.path.dirname(__file__)],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    RIETVELD_REVISION = out.strip()
+    p.wait()
+    del p, out, err
 except:
     pass
 
