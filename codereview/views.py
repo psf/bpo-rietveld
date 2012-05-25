@@ -285,7 +285,7 @@ class RepoForm(forms.Form):
 class BranchForm(forms.Form):
   category = forms.CharField(
     widget=forms.Select(choices=[(ch, ch)
-                                 for ch in models.Branch.category.choices]))
+                                 for ch in models.Branch._meta.get_field('category').choices]))
   name = forms.CharField()
   url = forms.URLField()
 
