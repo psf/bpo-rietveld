@@ -1,0 +1,7 @@
+begin;
+alter table codereview_issue add repo_guid varchar(500) default null;
+alter table codereview_patchset drop owner_id;
+alter table codereview_message add in_reply_to_id integer default null references codereview_message;
+alter table codereview_bucket add quoted boolean default false;
+alter table codereview_repository add guid varchar(500) default null;
+commit;
