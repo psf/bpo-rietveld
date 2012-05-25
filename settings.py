@@ -2,7 +2,7 @@
 
 # NOTE: Keep the settings.py in examples directories in sync with this one!
 
-import os, ConfigParser, re
+import os, ConfigParser, re, subprocess
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
