@@ -79,7 +79,7 @@ urlpatterns = patterns(
     (r'^_ah/mail/(.*)', 'incoming_mail'),
     (r'^xsrf_token$', 'xsrf_token'),
     # patching upload.py on the fly
-    (r'^static/upload.py$', 'customized_upload_py'),
+    (r'^dynamic/upload.py$', 'customized_upload_py'),
     (r'^search$', 'search'),
     (r'^tasks/calculate_delta$', 'calculate_delta'),
     )

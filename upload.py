@@ -290,7 +290,7 @@ class AbstractRpcServer(object):
                               response.headers, response.fp)
     self.authenticated = True
 
-  def _Authenticate(self):
+  def _Authenticate(self, err):
     """Authenticates the user.
 
     The authentication process works as follows:
@@ -372,8 +372,10 @@ class AbstractRpcServer(object):
     """
     # TODO: Don't require authentication.  Let the server say
     # whether it is necessary.
-    if not self.authenticated:
-      self._Authenticate()
+    # Skip this check for Django, we need a 401 to get the login
+    # URL (could be anywhere...).
+    #if not self.authenticated:
+    #  self._Authenticate()
 
     old_timeout = socket.getdefaulttimeout()
     socket.setdefaulttimeout(timeout)
@@ -416,9 +418,42 @@ class AbstractRpcServer(object):
 class HttpRpcServer(AbstractRpcServer):
   """Provides a simplified RPC-style interface for HTTP requests."""
 
-  def _Authenticate(self):
+  def _Authenticate(self, login_url="/accounts/login/"):
     """Save the cookie jar after authentication."""
-    super(HttpRpcServer, self)._Authenticate()
+    login_url = "%s%s" % (self.host, login_url)
+    print "Login URL: %r" % login_url
+    username = raw_input("Username: ")
+    password = getpass.getpass("Password: ")
+    fields = (("user_name", username), ("password", password))
+    req = self._CreateRequest(
+        url=login_url,
+        data=urllib.urlencode({
+            "username": username,
+            "password": password,
+        })
+    )
+    try:
+      response = self.opener.open(req)
+      #response_body = response.read()
+      #response_dict = dict(x.split("=")
+      #                     for x in response_body.split("\n") if x)
+      ErrorExit("Login failed.")
+      #return response_dict["Auth"]
+    except urllib2.HTTPError, e:
+      if e.code == 302:
+        self.cookie_jar.extract_cookies(e, req)
+        if self.save_cookies:
+          self.cookie_jar.save()
+        self.authenticated = True
+        return
+      elif e.code == 403:
+        body = e.read()
+        response_dict = dict(x.split("=", 1) for x in body.split("\n") if x)
+        raise ClientLoginError(req.get_full_url(), e.code, e.msg,
+                               e.headers, response_dict)
+      else:
+        raise
+
     if self.save_cookies:
       StatusUpdate("Saving authentication cookies to %s" % self.cookie_file)
       self.cookie_jar.save()
@@ -614,23 +649,7 @@ def GetRpcServer(server, email=None, host_override=None, save_cookies=True,
 
   rpc_server_class = HttpRpcServer
 
-  # If this is the dev_appserver, use fake authentication.
   host = (host_override or server).lower()
-  if re.match(r'(http://)?localhost([:/]|$)', host):
-    if email is None:
-      email = "test@example.com"
-      logging.info("Using debug user %s.  Override with --email" % email)
-    server = rpc_server_class(
-        server,
-        lambda: (email, "password"),
-        host_override=host_override,
-        extra_headers={"Cookie":
-                       'dev_appserver_login="%s:False"' % email},
-        save_cookies=save_cookies,
-        account_type=account_type)
-    # Don't try to talk to ClientLogin.
-    server.authenticated = True
-    return server
 
   def GetUserCredentials():
     """Prompts the user for a username and password."""

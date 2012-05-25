@@ -185,8 +185,12 @@ var publish_link = "{%url codereview.views.publish issue.key.id%}";
 <a class="novisit" href="{%url codereview.views.settings%}">Settings</a>
 |
 {%endif%}
-{%if is_dev%}
+{%if is_dev or user.is_superuser%}
 <a class="novisit" target="_blank" href="/_ah/admin">Admin</a>
+|
+{%endif%}
+{%if user%}
+<a class="novisit" target="_blank" href="/admin/password_change">Change password</a>
 |
 {%endif%}
 <a class="novisit" target="_blank"
