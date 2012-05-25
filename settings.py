@@ -72,13 +72,15 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'roundup_helper.middleware.LookupRoundupUser',
     'gae2django.middleware.FixRequestUserMiddleware',
+     # Keep in mind, that CSRF protection is DISABLED in this example!
+    'rietveld_helper.middleware.DisableCSRFMiddleware',
     'rietveld_helper.middleware.AddUserToRequestMiddleware',
     'django.middleware.doc.XViewMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.auth',    # required by admin panel
     'django.core.context_processors.request',
-    'django.contrib.auth.context_processors.auth'
 )
 
 ROOT_URLCONF = 'roundup_helper.urls'
@@ -100,6 +102,24 @@ INSTALLED_APPS = (
 
 AUTH_PROFILE_MODULE = 'codereview.Account'
 LOGIN_REDIRECT_URL = '/'
+
+#RIETVELD_INCOMING_MAIL_ADDRESS = ('reply@%s.appspotmail.com' % appid)
+RIETVELD_INCOMING_MAIL_MAX_SIZE = 500 * 1024  # 500K
+RIETVELD_REVISION = '<unknown>'
+try:
+    RIETVELD_REVISION = subprocess.check_output(['hg','identify','-i',
+                                                 os.path.dirname(__file__)
+                                                 ]).strip()
+except:
+    pass
+
+UPLOAD_PY_SOURCE = os.path.join(os.path.dirname(__file__), 'upload.py')
+
+# Default values for patch rendering
+DEFAULT_CONTEXT = 10
+DEFAULT_COLUMN_WIDTH = 80
+MIN_COLUMN_WIDTH = 3
+MAX_COLUMN_WIDTH = 2000
 
 # This won't work with gae2django.
 RIETVELD_INCOMING_MAIL_ADDRESS = None
