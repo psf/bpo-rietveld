@@ -4,7 +4,7 @@
 
 import os, ConfigParser, re, subprocess
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
